@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+    {% block content %}
+      <menu class="glass gap-4 px-4">
+      <div class="section-label">
+        /Nikki/Personal
+        </div>
+        <div class="navbar flex gap-4 justify-start">
+        {% for page in pages %}
+          <a class="btn btn-primary btn-flat" href="{{url_for(page.name)}}">{{page.name.replace("_"," ")}}</a>
+          {% if not loop.last %}
+          <span class=" w-10 h-[2px] bg-[var(--ink-muted-pink)]"></span>
+          {% endif %}
+        {% endfor %}
+          <span class=" flex-1 h-[2px] bg-[var(--ink-muted-pink)]"></span>
+      </menu>
+      </div>
+    </div>
+    {% endblock %}

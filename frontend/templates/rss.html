@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex flex-col gap-4">
+
+  <menu class="glass gap-4 p-4">
+    <div class="section-label">
+      <span>/Nikki/rss</span>
+      <div class="flex justify-end gap-2">
+        <a class="btn btn-outline btn-flat" href="{{ url_for('index') }}">home</a>
+      </div>
+    </div>
+  </menu>
+
+  <div class="post-card no-hover">
+    <span class="section-label"><span>add feed</span></span>
+    <form action="/rss/add_rss" class="flex flex-row flex-wrap gap-3 items-end" method="post">
+      <div class="flex flex-row gap-1">
+        <label for="link" class="tag">feed URL:</label>
+        <input id="link" type="url" name="link" class="form-control"
+               placeholder="https://example.com/feed.xml" required>
+      </div>
+      <div class="flex flex-row gap-1">
+        <label for="name" class="tag">title:</label>
+        <input id="name" type="text" name="name" class="form-control" placeholder="my feed ">
+      </div>
+    </form>
+      <button type="submit" class="btn btn-secondary">save feed</button>
+  </div>
+
+  <div class="post-card no-hover">
+    <span class="section-label"><span>search entries</span></span>
+    <form method="get" action="{{ url_for('rss') }}" class="flex flex-row flex-wrap gap-3 items-end">
+      <div class="flex flex-row gap-1">
+        <label for="feed_id" class="tag">filter by feed:</label>
+        <select id="feed_id" name="feed_id" class="form-control">
+          <option value="">all feeds</option>
+          {% for feed in feeds %}
+            <option value="{{ feed.id }}"
+              {% if request.query_params.get('feed_id')|string == feed.id|string %}selected{% endif %}>
+              {{ feed.title or feed.link }}
+            </option>
+          {% endfor %}
+        </select>
+
+      </div>
+      <button type="submit" class="btn btn-secondary">filter</button>
+      {% if request.query_params.get('q') or request.query_params.get('feed_id') %}
+        <a href="{{ url_for('rss') }}" class="btn btn-flat btn-sm">clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+
+  <div class="section-label">
+      {% if not feeds %}
+        <div class="post-card">
+          <div class="post-title">no feeds yet</div>
+          <div class="post-excerpt">add a feed url above to get started.</div>
+        </div>
+      {% endif %}
+      {% for entry in top_articles %}
+        <a class="post-card" href="{{ entry.link }}" target="_blank" rel="noopener">
+          <div class="post-title">{{ entry.title }}</div>
+          {% if entry.summary %}
+            <div class="post-excerpt">
+              {{ entry.summary | striptags | truncate(160) }}
+            </div>
+          {% endif %}
+          <div class="post-meta">
+            {% if entry.author %}
+              <span>·</span>
+              <span>{{ entry.author }}</span>
+            {% endif %}
+            {% if entry.published %}
+              <span>{{ entry.published.strftime('%b %d, %Y') }}</span>
+            {% else %}
+              <span class="tag tag-rss">no date</span>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+  </div>
+</div>
+{% endblock %}
